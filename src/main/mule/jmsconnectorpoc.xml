@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="6124ecee-7bcc-43d0-ac95-93c50881f5c6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<jms:config name="JMS_Config1" doc:name="JMS Config" doc:id="c3762b1c-1f93-4e0c-875a-dd86945bd9f0" >
+		<jms:active-mq-connection username="admin" password="admin" >
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="jmsconnectorpocFlow" doc:id="6438b9d6-38ef-4065-974e-14240f3d8976" >
+		<http:listener doc:name="Listener" doc:id="5a43aabb-43d1-4756-96aa-16d5ffbbfcc3" config-ref="HTTP_Listener_config" path="/test"/>
+		<logger level="INFO" doc:name="Logger" doc:id="d776834d-bbf7-4a3c-9e4b-14431e73a503" />
+		<jms:consume doc:name="Consume" doc:id="038dd881-db11-4901-9b8d-7d7402e056b7" config-ref="JMS_Config1" destination="annuQueues"/>
+		<ee:transform doc:name="Transform Message" doc:id="1c12d6ed-fee1-4daf-b02c-59ae405306b1">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="0382d226-d67f-4df1-a9e1-8d764faf42cf" />
+	</flow>
+</mule>
